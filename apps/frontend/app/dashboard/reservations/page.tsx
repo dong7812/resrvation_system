@@ -29,7 +29,7 @@ export default function ReservationsPage() {
     if (!file) return;
     importMutation.mutate(file, {
       onSuccess: (result) => {
-        setImportResult(result);
+        setImportResult(result as { imported: number; skipped: number; errors: string[] });
         if (fileInputRef.current) fileInputRef.current.value = '';
       },
       onError: () => {
