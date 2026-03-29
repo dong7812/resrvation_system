@@ -16,17 +16,19 @@ import { Admin } from './auth/entities/admin.entity';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => {
-        const isProd = config.get('NODE_ENV') === 'production';
+        const dbHost = config.get('DB_HOST', 'localhost');
+        const isRds = dbHost !== 'localhost' && dbHost !== '127.0.0.1';
+        const dbSync = config.get('DB_SYNC') === 'true';
         return {
           type: 'postgres',
-          host: config.get('DB_HOST', 'localhost'),
+          host: dbHost,
           port: config.get<number>('DB_PORT', 5432),
           username: config.get('DB_USERNAME', 'postgres'),
           password: config.get('DB_PASSWORD', 'password'),
           database: config.get('DB_DATABASE', 'reservation_db'),
           entities: [Reservation, Admin],
-          synchronize: !isProd, // RDS 프로덕션에서는 반드시 false
-          ssl: isProd ? { rejectUnauthorized: false } : false,
+          synchronize: dbSync,
+          ssl: isRds ? { rejectUnauthorized: false } : false,
         };
       },
       inject: [ConfigService],
