@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { api, apiClient } from '@/lib/api';
 import type { Reservation, Stats } from '@/lib/types';
 
 // ── 예약 목록 조회
