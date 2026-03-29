@@ -6,9 +6,12 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // CORS (Next.js 프론트엔드 허용)
+  // CORS
   app.enableCors({
-    origin: ['http://localhost:3000'],
+    origin: [
+      'http://localhost:3000',
+      /\.amplifyapp\.com$/,   // Amplify 전체 서브도메인 허용
+    ],
     credentials: true,
   });
 
