@@ -10,7 +10,9 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'http://localhost:3000',
-      /\.amplifyapp\.com$/,   // Amplify 전체 서브도메인 허용
+      /\.amplifyapp\.com$/,
+      'https://www.dklee.shop',
+      'https://dklee.shop',
     ],
     credentials: true,
   });
