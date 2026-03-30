@@ -1,7 +1,8 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, Calendar, ClipboardList,
   Mail, Users, BarChart2, LogOut,
@@ -20,8 +21,14 @@ const NAV = [
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const logout = useLogout();
+  const token = useAuthStore((s) => s.token);
   const admin = useAuthStore((s) => s.admin);
+
+  useEffect(() => {
+    if (!token) router.replace('/login');
+  }, [token, router]);
 
   return (
     <div className="flex min-h-screen">
