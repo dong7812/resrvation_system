@@ -44,20 +44,19 @@ export default function EmailPage() {
     setParsed(null);
 
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1024,
-          system: `케이터링 예약 이메일 파서. 순수 JSON만 반환:
-{"isReservation":bool,"name":"","phone":"","email":"","eventName":"","venue":"","eventDate":"YYYY-MM-DD","tastingDate":"YYYY-MM-DD","guestCount":0,"note":""}`,
-          messages: [{ role: 'user', content: emailText }],
-        }),
-      });
-      const data = await res.json();
-      const text = data.content[0].text.replace(/```json|```/g, '').trim();
-      const result = JSON.parse(text);
+      const token = localStorage.getItem('access_token');
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'}/email/parse`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ text: emailText }),
+        },
+      );
+      const result = await res.json();
 
       if (result.isReservation) {
         setParsed(result);
