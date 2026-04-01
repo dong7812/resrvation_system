@@ -17,7 +17,7 @@ export interface ParsedReservation {
 
 // Bedrock에서 사용 가능한 Claude 모델 ID
 // 콘솔 > Bedrock > Model access 에서 활성화 필요
-const BEDROCK_MODEL_ID = 'anthropic.claude-3-5-sonnet-20241022-v2:0';
+const BEDROCK_MODEL_ID = 'apac.anthropic.claude-3-5-sonnet-20241022-v2:0';
 
 @Injectable()
 export class AiService {
