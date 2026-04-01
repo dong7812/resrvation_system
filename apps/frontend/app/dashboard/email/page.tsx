@@ -58,13 +58,15 @@ export default function EmailPage() {
       );
       const result = await res.json();
 
-      if (result.isReservation) {
+      if (!res.ok) {
+        setParseError(`서버 오류 (${res.status}): ${result.message ?? '백엔드 연결을 확인해주세요.'}`);
+      } else if (result.isReservation) {
         setParsed(result);
       } else {
-        setParseError('예약 관련 이메일이 아닙니다.');
+        setParseError('예약/문의 관련 이메일이 아닙니다.');
       }
-    } catch {
-      setParseError('파싱 실패. 이메일 내용을 확인해주세요.');
+    } catch (e) {
+      setParseError(`파싱 실패: ${e instanceof Error ? e.message : '이메일 내용을 확인해주세요.'}`);
     } finally {
       setIsParsing(false);
     }

@@ -32,13 +32,12 @@ export class AiService {
   }
 
   async parseEmailToReservation(emailText: string): Promise<ParsedReservation> {
-    try {
-      const command = new ConverseCommand({
-        modelId: BEDROCK_MODEL_ID,
-        system: [
-          {
-            text: `당신은 케이터링 예약 이메일 파서입니다.
-이메일 텍스트를 분석하여 예약 정보를 추출하고 아래 JSON 형식으로만 반환하세요.
+    const command = new ConverseCommand({
+      modelId: BEDROCK_MODEL_ID,
+      system: [
+        {
+          text: `당신은 케이터링 예약 및 문의 이메일 파서입니다.
+이메일 텍스트를 분석하여 예약/문의 정보를 추출하고 아래 JSON 형식으로만 반환하세요.
 설명, 마크다운 코드블록 없이 순수 JSON만 반환하세요.
 
 {
@@ -54,24 +53,21 @@ export class AiService {
   "note": "문의사항"
 }
 
-예약 관련 이메일이 아니면 isReservation: false, 나머지는 빈 값으로 반환.`,
-          },
-        ],
-        messages: [{ role: 'user', content: [{ text: emailText }] }],
-        inferenceConfig: { maxTokens: 1024 },
-      });
+isReservation 판단 기준:
+- 케이터링, 출장 뷔페, 행사 음식, 시식, 예약, 문의 등 케이터링 서비스와 관련된 내용이면 true
+- 광고, 스팸, 케이터링과 무관한 내용이면 false
 
-      const response = await this.client.send(command);
-      const raw = response.output?.message?.content?.[0]?.text ?? '';
-      const cleaned = raw.replace(/```json|```/g, '').trim();
-      return JSON.parse(cleaned);
-    } catch (error) {
-      this.logger.error('이메일 파싱 실패:', error);
-      return {
-        isReservation: false,
-        name: '', phone: '', email: '', eventName: '',
-        venue: '', eventDate: '', tastingDate: '', guestCount: 0, note: '',
-      };
-    }
+날짜는 YYYY-MM-DD 형식으로 변환하고, 없는 정보는 빈 문자열("") 또는 0으로 반환.`,
+        },
+      ],
+      messages: [{ role: 'user', content: [{ text: emailText }] }],
+      inferenceConfig: { maxTokens: 1024 },
+    });
+
+    const response = await this.client.send(command);
+    const raw = response.output?.message?.content?.[0]?.text ?? '';
+    this.logger.log('Bedrock 응답 원문:', raw);
+    const cleaned = raw.replace(/```json\n?|```/g, '').trim();
+    return JSON.parse(cleaned);
   }
 }
